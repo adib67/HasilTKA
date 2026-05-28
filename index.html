@@ -274,4 +274,168 @@
                 
                 const pctMtk = {
                     Baik: (countMtk.Baik / totalSiswa * 100).toFixed(0),
-    
+    Memadai: (countMtk.Memadai / totalSiswa * 100).toFixed(0),
+                    Kurang: (countMtk.Kurang / totalSiswa * 100).toFixed(0)
+                };
+                const pctIndo = {
+                    Baik: (countIndo.Baik / totalSiswa * 100).toFixed(0),
+                    Memadai: (countIndo.Memadai / totalSiswa * 100).toFixed(0),
+                    Kurang: (countIndo.Kurang / totalSiswa * 100).toFixed(0)
+                };
+
+                container.innerHTML = `
+                    <div class="m3-glass stats-panel efek-surprise">
+                        <div class="stats-title">
+                            <i class="fa-solid fa-chart-pie" style="color:#0066ff;"></i> Rekapitulasi Nilai Kelas 6
+                        </div>
+                        
+                        <div class="stats-grid-mini">
+                            <div class="stats-card-mini">
+                                <div class="label">Rata-Rata MTK</div>
+                                <div class="val">${avgMtk}</div>
+                            </div>
+                            <div class="stats-card-mini">
+                                <div class="label">Rata-Rata INDO</div>
+                                <div class="val">${avgIndo}</div>
+                            </div>
+                        </div>
+
+                        <div class="chart-section">
+                            <h4>Distribusi Predikat Matematika</h4>
+                            <div class="bar-container">
+                                <div class="bar-row">
+                                    <div class="bar-label">Baik</div>
+                                    <div class="bar-track"><div class="bar-fill fill-baik" style="width: ${pctMtk.Baik}%"></div></div>
+                                    <div class="bar-count">${countMtk.Baik} Anak</div>
+                                </div>
+                                <div class="bar-row">
+                                    <div class="bar-label">Memadai</div>
+                                    <div class="bar-track"><div class="bar-fill fill-memadai" style="width: ${pctMtk.Memadai}%"></div></div>
+                                    <div class="bar-count">${countMtk.Memadai} Anak</div>
+                                </div>
+                                <div class="bar-row">
+                                    <div class="bar-label">Kurang</div>
+                                    <div class="bar-track"><div class="bar-fill fill-kurang" style="width: ${pctMtk.Kurang}%"></div></div>
+                                    <div class="bar-count">${countMtk.Kurang} Anak</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-section">
+                            <h4>Distribusi Predikat B. Indonesia</h4>
+                            <div class="bar-container">
+                                <div class="bar-row">
+                                    <div class="bar-label">Baik</div>
+                                    <div class="bar-track"><div class="bar-fill fill-baik" style="width: ${pctIndo.Baik}%"></div></div>
+                                    <div class="bar-count">${countIndo.Baik} Anak</div>
+                                </div>
+                                <div class="bar-row">
+                                    <div class="bar-label">Memadai</div>
+                                    <div class="bar-track"><div class="bar-fill fill-memadai" style="width: ${pctIndo.Memadai}%"></div></div>
+                                    <div class="bar-count">${countIndo.Memadai} Anak</div>
+                                </div>
+                                <div class="bar-row">
+                                    <div class="bar-label">Kurang</div>
+                                    <div class="bar-track"><div class="bar-fill fill-kurang" style="width: ${pctIndo.Kurang}%"></div></div>
+                                    <div class="bar-count">${countIndo.Kurang} Anak</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (menu === 'nilaiku') {
+                navNilaiku.classList.add('active');
+                panelPencarian.classList.remove('hidden');
+                document.getElementById('nisnInput').value = "";
+            }
+        }
+
+        function prosesCari() {
+            const inputNisn = document.getElementById('nisnInput').value.trim();
+            const loadingArea = document.getElementById('loadingArea');
+            const container = document.getElementById('contentOutput');
+            const btnCari = document.getElementById('btnCari');
+
+            if (inputNisn === "" || inputNisn.length < 5) {
+                container.innerHTML = `<div class="alert-error efek-surprise">Masukkan NISN valid secara lengkap untuk memeriksa nilai!</div>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            loadingArea.classList.remove('hidden');
+            btnCari.disabled = true;
+            btnCari.style.opacity = "0.5";
+
+            setTimeout(() => {
+                loadingArea.classList.add('hidden');
+                btnCari.disabled = false;
+                btnCari.style.opacity = "1";
+
+                const siswa = dataSiswaTeranking.find(s => s.nisn === inputNisn);
+
+                if (siswa) {
+                    const badgeMtk = getM3BadgeStyle(siswa.ketMtk);
+                    const badgeBi = getM3BadgeStyle(siswa.ketBing);
+                    const medal = getRankBadge(siswa.rank);
+
+                    let cardColorClass = "m3-glass";
+                    if (siswa.rank === 1) cardColorClass = "m3-glass glass-gold";
+                    else if (siswa.rank === 2) cardColorClass = "m3-glass glass-silver";
+                    else if (siswa.rank === 3) cardColorClass = "m3-glass glass-bronze";
+
+                    container.innerHTML = `
+                        <div class="${cardColorClass} card-result efek-surprise">
+                            <div class="result-head">
+                                <div>${medal}</div>
+                                <h3>${siswa.nama}</h3>
+                                <p>NISN: ${siswa.nisn}</p>
+                            </div>
+                            
+                            <div class="result-body">
+                                <div class="score-box-item">
+                                    <div class="score-box-left">
+                                        <div class="name">MATEMATIKA</div>
+                                        <div class="pred-badge ${badgeMtk}">${siswa.ketMtk}</div>
+                                    </div>
+                                    <div class="score-box-right">${siswa.mtk.toFixed(2)}</div>
+                                </div>
+                                
+                                <div class="score-box-item">
+                                    <div class="score-box-left">
+                                        <div class="name">BAHASA INDONESIA</div>
+                                        <div class="pred-badge ${badgeBi}">${siswa.ketBing}</div>
+                                    </div>
+                                    <div class="score-box-right">${siswa.bing.toFixed(2)}</div>
+                                </div>
+                            </div>
+
+                            <div class="result-foot">
+                                Rata-Rata Ujian Kombinasi: ${siswa.rataRata}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `<div class="alert-error efek-surprise">NISN tidak ditemukan. Pastikan 10 digit nomor yang Anda masukkan sudah benar!</div>`;
+                }
+            }, 1200);
+        }
+
+        function getRankBadge(rank) {
+            if (rank === 1) return `<div class="rank-badge badge-gold"><i class="fa-solid fa-trophy"></i> Rank 1</div>`;
+            if (rank === 2) return `<div class="rank-badge badge-silver"><i class="fa-solid fa-medal"></i> Rank 2</div>`;
+            if (rank === 3) return `<div class="rank-badge badge-bronze"><i class="fa-solid fa-medal"></i> Rank 3</div>`;
+            return `<div class="rank-badge badge-normal">Rank #${rank}</div>`;
+        }
+
+        function getM3BadgeStyle(keterangan) {
+            if (keterangan === "Baik") return "p-baik";
+            if (keterangan === "Memadai") return "p-memadai";
+            return "p-kurang";
+        }
+
+        window.onload = function() {
+            pindahMenu('nilaiku');
+        };
+    </script>
+</body>
+</html>
