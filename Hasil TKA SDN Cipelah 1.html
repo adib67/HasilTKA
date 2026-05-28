@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengumuman Hasil TKA 2026 - SDN CIPELAH 1</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        /* Animasi kejutan muncul memantul */
+        @keyframes joss {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .efek-surprise {
+            animation: joss 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <header class="bg-blue-600 text-white shadow-md">
+        <div class="max-w-md mx-auto px-4 py-6 text-center">
+            <p class="text-xs font-bold tracking-widest uppercase opacity-80">Dinas Pendidikan Kab. Bandung</p>
+            <h1 class="text-xl font-extrabold mt-1">SDN CIPELAH 1</h1>
+            <p class="text-sm opacity-90 mt-1">Hasil Tes Kemampuan Akademik (TKA) 2026</p>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto w-full px-4 py-6 flex-grow">
+        
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-6">
+            <h2 class="text-base font-bold mb-1 text-slate-700">Cari Berdasarkan Nama</h2>
+            <p class="text-xs text-slate-500 mb-4">Ketik nama panggilan atau nama lengkap kamu di bawah ini.</p>
+            
+            <div class="space-y-3">
+                <input type="text" id="nameInput" placeholder="Contoh: Ilham atau Siti..." 
+                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base font-semibold">
+                
+                <button onclick="prosesCari()" id="btnCari"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 active:scale-[0.99] flex justify-center items-center gap-2">
+                    <span>Periksa Nilai Kamu ✨</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="loadingArea" class="hidden flex flex-col items-center justify-center py-10 space-y-3">
+            <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-sm font-semibold text-blue-600 animate-pulse">Membuka amplop nilai kamu...</p>
+        </div>
+
+        <div id="resultArea" class="space-y-4">
+            </div>
+
+    </main>
+
+    <footer class="max-w-md mx-auto w-full px-4 py-4 text-center text-xs text-slate-400 border-t border-slate-100">
+        &copy; 2026 SDN CIPELAH 1. <br>Kepala Sekolah: Partimah, S.Pd.
+    </footer>
+
+    <script>
+        // Data lengkap hasil TKA SDN CIPELAH 1
+        const dataSiswa = [
+            { no: "1", nisn: "0132461788", nama: "ILHAM RIZKY ALFAHRIZI", mtk: "43.33", ketMtk: "Memadai", bing: "56.67", ketBing: "Memadai" },
+            { no: "2", nisn: "3130974096", nama: "SITI WIDIA", mtk: "33.33", ketMtk: "Memadai", bing: "40.00", ketBing: "Kurang" },
+            { no: "3", nisn: "0151908712", nama: "DAVI KAIS JUANDA", mtk: "30.00", ketMtk: "Kurang", bing: "43.33", ketBing: "Kurang" },
+            { no: "4", nisn: "0143885017", nama: "SILVIANI NOVITA SARI", mtk: "53.33", ketMtk: "Memadai", bing: "60.00", ketBing: "Memadai" },
+            { no: "5", nisn: "0135754495", nama: "INTAN AYU KHARISMAWATI", mtk: "60.00", ketMtk: "Baik", bing: "76.67", ketBing: "Baik" },
+            { no: "6", nisn: "0133226475", nama: "SRI NURI RAHAYU", mtk: "50.00", ketMtk: "Memadai", bing: "56.67", ketBing: "Memadai" },
+            { no: "7", nisn: "0138337206", nama: "RESA APRISA SUTIAWAN", mtk: "26.67", ketMtk: "Kurang", bing: "66.67", ketBing: "Memadai" },
+            { no: "8", nisn: "0137862566", nama: "N. RISKA", mtk: "70.00", ketMtk: "Baik", bing: "80.00", ketBing: "Baik" },
+            { no: "9", nisn: "0133165607", nama: "DEBI SAPA MAULANA", mtk: "43.33", ketMtk: "Memadai", bing: "66.67", ketBing: "Memadai" },
+            { no: "10", nisn: "3120819714", nama: "ALFA FADEL ALRAFIF", mtk: "43.33", ketMtk: "Memadai", bing: "36.67", ketBing: "Kurang" },
+            { no: "11", nisn: "3133464749", nama: "KEISYA AINUN NISA AZ-ZAHRA", mtk: "46.67", ketMtk: "Memadai", bing: "80.00", ketBing: "Baik" },
+            { no: "12", nisn: "0137851232", nama: "RAZKA DEAN PRAYOGA", mtk: "23.33", ketMtk: "Kurang", bing: "60.00", ketBing: "Memadai" },
+            { no: "13", nisn: "0128121725", nama: "KAPA ADITIΑ", mtk: "33.33", ketMtk: "Memadai", bing: "30.00", ketBing: "Kurang" },
+            { no: "14", nisn: "3135763448", nama: "DESRI DESTIARA SAPIRA", mtk: "40.00", ketMtk: "Memadai", bing: "60.00", ketBing: "Memadai" },
+            { no: "15", nisn: "3135739079", nama: "WANDI IJAYA PUTRA", mtk: "63.33", ketMtk: "Baik", bing: "70.00", ketBing: "Memadai" },
+            { no: "16", nisn: "0135438266", nama: "MUHAMMAD RIZWAN AGUSTIN", mtk: "53.33", ketMtk: "Memadai", bing: "50.00", ketBing: "Memadai" },
+            { no: "17", nisn: "0148872031", nama: "AMANDA AULIA PUTRI", mtk: "50.00", ketMtk: "Memadai", bing: "70.00", ketBing: "Memadai" },
+            { no: "18", nisn: "0139146427", nama: "MUHAMAD REHAN", mtk: "33.33", ketMtk: "Memadai", bing: "43.33", ketBing: "Kurang" },
+            { no: "19", nisn: "3141557319", nama: "ISMA", mtk: "50.00", ketMtk: "Memadai", bing: "56.67", ketBing: "Memadai" },
+            { no: "20", nisn: "3148931316", nama: "MUHAMMAD FADIL FEBRIANSYAH", mtk: "43.33", ketMtk: "Memadai", bing: "33.33", ketBing: "Kurang" },
+            { no: "21", nisn: "0138470816", nama: "MUHAMAD RAYHAN", mtk: "30.00", ketMtk: "Kurang", bing: "63.33", ketBing: "Memadai" },
+            { no: "22", nisn: "0137045398", nama: "NAFIS MUHAMMAD HASAN", mtk: "56.67", ketMtk: "Baik", bing: "50.00", ketBing: "Memadai" },
+            { no: "23", nisn: "0136386385", nama: "TENDI HERDIAN", mtk: "46.67", ketMtk: "Memadai", bing: "53.33", ketBing: "Memadai" },
+            { no: "24", nisn: "0142605057", nama: "ELISYA CANTIKA ANGGRAENI", mtk: "30.00", ketMtk: "Kurang", bing: "53.33", ketBing: "Memadai" },
+            { no: "25", nisn: "0134912950", nama: "DIO FANI SEPTA PRATAMA", mtk: "33.33", ketMtk: "Memadai", bing: "26.67", ketBing: "Kurang" },
+            { no: "26", nisn: "0134987757", nama: "DASEP MAULANA", mtk: "26.67", ketMtk: "Kurang", bing: "43.33", ketBing: "Kurang" },
+            { no: "27", nisn: "3139622400", nama: "MUHAMAD SANDI PIRMANSYAH", mtk: "43.33", ketMtk: "Memadai", bing: "40.00", ketBing: "Kurang" },
+            { no: "28", nisn: "3132274032", nama: "SHAKILA A ALIFATUNNISA NUR", mtk: "46.67", ketMtk: "Memadai", bing: "70.00", ketBing: "Memadai" },
+            { no: "29", nisn: "0148383922", nama: "ASQIA FRIDA ANJANI", mtk: "36.67", ketMtk: "Memadai", bing: "60.00", ketBing: "Memadai" },
+            { no: "30", nisn: "0136863145", nama: "MUHAMAD NIZAR NUR RAZAB", mtk: "60.00", ketMtk: "Baik", bing: "70.00", ketBing: "Memadai" },
+            { no: "31", nisn: "0147026809", nama: "AMELIA AZAHRA", mtk: "26.67", ketMtk: "Kurang", bing: "46.67", ketBing: "Kurang" },
+            { no: "32", nisn: "0133103346", nama: "FADIYA SYIFWATUL YUMNA", mtk: "53.33", ketMtk: "Memadai", bing: "80.00", ketBing: "Baik" },
+            { no: "33", nisn: "0138485605", nama: "AL NADJIHAN NABIL MUFTI", mtk: "53.33", ketMtk: "Memadai", bing: "56.67", ketBing: "Memadai" },
+            { no: "34", nisn: "3123565730", nama: "ILHAM HAMZAH", mtk: "53.33", ketMtk: "Memadai", bing: "46.67", ketBing: "Kurang" },
+            { no: "35", nisn: "0144200858", nama: "RIFANI NAZWA KHAIRA", mtk: "46.67", ketMtk: "Memadai", bing: "46.67", ketBing: "Kurang" }
+        ];
+
+        function prosesCari() {
+            const input = document.getElementById('nameInput').value.toUpperCase().trim();
+            const resultArea = document.getElementById('resultArea');
+            const loadingArea = document.getElementById('loadingArea');
+            const btnCari = document.getElementById('btnCari');
+
+            // Validasi jika input kurang dari 2 karakter
+            if (input === "" || input.length < 2) {
+                resultArea.innerHTML = `
+                    <div class="bg-amber-50 border border-amber-200 text-amber-700 p-4 rounded-xl text-center text-sm font-semibold">
+                        Ketik minimal 2 huruf untuk mulai mencari!
+                    </div>
+                `;
+                return;
+            }
+
+            // Sembunyikan hasil lama, kunci tombol, dan tampilkan loading
+            resultArea.innerHTML = "";
+            loadingArea.classList.remove('hidden');
+            btnCari.disabled = true;
+            btnCari.classList.add('opacity-50');
+
+            // Jeda dramatis (1.5 Detik) sebelum menampilkan hasil surprise
+            setTimeout(() => {
+                loadingArea.classList.add('hidden');
+                btnCari.disabled = false;
+                btnCari.classList.remove('opacity-50');
+                
+                // Cari data siswa berdasarkan kecocokan nama
+                const hasilFilter = dataSiswa.filter(s => s.nama.includes(input));
+
+                if (hasilFilter.length > 0) {
+                    let htmlContent = "";
+                    
+                    hasilFilter.forEach(siswa => {
+                        const badgeMtk = getBadgeClass(siswa.ketMtk);
+                        const badgeBi = getBadgeClass(siswa.ketBing);
+
+                        htmlContent += `
+                            <div class="bg-white rounded-2xl shadow-xl border-2 border-blue-500 p-6 space-y-4 efek-surprise relative overflow-hidden">
+                                <div class="absolute -top-6 -right-6 w-16 h-16 bg-yellow-400 rounded-full opacity-20 blur-sm"></div>
+                                <div class="absolute -bottom-6 -left-6 w-14 h-14 bg-blue-400 rounded-full opacity-20 blur-sm"></div>
+                                
+                                <div class="border-b border-slate-100 pb-3 text-center">
+                                    <span class="text-[10px] font-extrabold bg-amber-100 text-amber-800 px-3 py-1 rounded-full uppercase tracking-wider">✨ Data Ditemukan ✨</span>
+                                    <h3 class="text-xl font-black text-slate-800 mt-3 tracking-tight">${siswa.nama}</h3>
+                                    <p class="text-xs text-slate-400 font-semibold mt-0.5">NISN: ${siswa.nisn}</p>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="bg-gradient-to-b from-slate-50 to-slate-100/50 p-4 rounded-2xl border border-slate-100 text-center shadow-inner">
+                                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Matematika</p>
+                                        <p class="text-3xl font-black text-slate-800 my-1">${siswa.mtk}</p>
+                                        <span class="inline-block text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${badgeMtk}">${siswa.ketMtk}</span>
+                                    </div>
+                                    <div class="bg-gradient-to-b from-slate-50 to-slate-100/50 p-4 rounded-2xl border border-slate-100 text-center shadow-inner">
+                                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">B. Indonesia</p>
+                                        <p class="text-3xl font-black text-slate-800 my-1">${siswa.bing}</p>
+                                        <span class="inline-block text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${badgeBi}">${siswa.ketBing}</span>
+                                    </div>
+                                </div>
+                                
+                                <p class="text-xs text-center text-blue-600 font-bold italic pt-2 animate-bounce">
+                                    🎉 Selamat ya! Tingkatkan terus prestasimu! 🎉
+                                </p>
+                            </div>
+                        `;
+                    });
+                    
+                    resultArea.innerHTML = htmlContent;
+                } else {
+                    resultArea.innerHTML = `
+                        <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-center text-sm font-semibold efek-surprise">
+                            Nama tidak ditemukan. Coba ketik nama panggilan lainnya ya!
+                        </div>
+                    `;
+                }
+            }, 1500);
+        }
+
+        function getBadgeClass(keterangan) {
+            if (keterangan === "Baik") return "bg-green-100 text-green-700";
+            if (keterangan === "Memadai") return "bg-blue-100 text-blue-700";
+            return "bg-amber-100 text-amber-700";
+        }
+    </script>
+</body>
+</html>
