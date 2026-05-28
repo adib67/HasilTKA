@@ -4,190 +4,331 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pengumuman Hasil TKA 2026 - SDN CIPELAH 1</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        /* CSS Murni Klasik - Struktur Stabil & Bebas Kendala Kompilator HP */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #f0f7ff; /* REVISI: Latar belakang biru yang sangat tipis banget */
+            color: #1a202c;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container-mobile {
+            max-width: 440px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        /* Efek Kaca Glassmorphism Standard */
+        .m3-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+        }
         
-        /* Animasi kejutan muncul memantul */
-        @keyframes joss {
-            0% { transform: scale(0.3); opacity: 0; }
-            50% { transform: scale(1.05); }
-            70% { transform: scale(0.9); }
+        header { text-align: center; }
+        header .badge-top {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: #0066ff;
+            color: white;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        header h1 { font-size: 20px; font-weight: 800; color: #111827; }
+        header p { font-size: 12px; color: #6b7280; font-weight: 600; margin-top: 2px; }
+        
+        /* Form Pencarian */
+        .search-box { display: flex; flex-direction: column; gap: 12px; }
+        .search-box h2 { font-size: 14px; font-weight: 800; color: #374151; }
+        .search-box p { font-size: 11px; color: #6b7280; font-weight: 500; }
+        .input-wrapper { position: relative; width: 100%; }
+        .input-wrapper .icon-fa { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #9ca3af; }
+        .input-wrapper input {
+            width: 100%; padding: 12px 12px 12px 38px; border-radius: 16px;
+            border: 1px solid #e5e7eb; background: rgba(255,255,255,0.9);
+            font-size: 14px; font-weight: 600; outline: none;
+        }
+        .input-wrapper input:focus { border-color: #0066ff; background: #fff; }
+        
+        .btn-cari {
+            width: 100%; padding: 14px; background: #0066ff; color: white;
+            border: none; border-radius: 16px; font-size: 14px; font-weight: 800;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-cari:active { transform: scale(0.98); }
+        
+        /* Animasi Spinner Loading */
+        .loading-area { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 0; gap: 10px; }
+        .spinner {
+            width: 36px; height: 36px; border: 4px solid rgba(0,102,255,0.15);
+            border-top-color: #0066ff; border-radius: 50%; animation: putar 0.8s linear infinite;
+        }
+        @keyframes putar { to { transform: rotate(360deg); } }
+        .loading-text { font-size: 12px; font-weight: 700; color: #0066ff; animation: denyut 1s ease-in-out infinite alternate; }
+        @keyframes denyut { from { opacity: 0.5; } to { opacity: 1; } }
+        
+        /* Animasi Kejutan Hasil Muncul (Bounce Pop Up) */
+        @keyframes surprisePop {
+            0% { transform: scale(0.4); opacity: 0; }
+            50% { transform: scale(1.04); }
+            70% { transform: scale(0.96); }
             100% { transform: scale(1); opacity: 1; }
         }
-        .efek-surprise {
-            animation: joss 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        .efek-surprise { animation: surprisePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards; }
+        
+        /* === TAMPILAN KARTU HASIL PENCARIAN === */
+        .card-result { display: flex; flex-direction: column; gap: 16px; }
+        
+        /* REVISI: Mengunci properti padding & radius agar Rank 1-3 tidak berantakan lagi */
+        @keyframes kilau { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .glass-gold {
+            background: linear-gradient(270deg, rgba(209, 250, 229, 0.65), rgba(167, 243, 208, 0.85), rgba(209, 250, 229, 0.65)) !important;
+            background-size: 200% 200% !important; animation: kilau 4s ease infinite !important;
+            border: 2px solid #34d399 !important; box-shadow: 0 0 14px rgba(52, 211, 153, 0.25) !important;
         }
+        .glass-silver {
+            background: linear-gradient(135deg, rgba(219, 234, 254, 0.75) 0%, rgba(191, 219, 254, 0.55) 100%) !important;
+            border: 1px solid rgba(147, 197, 253, 0.5) !important;
+        }
+        .glass-bronze {
+            background: linear-gradient(135deg, rgba(255, 237, 213, 0.8) 0%, rgba(253, 186, 116, 0.45) 100%) !important;
+            border: 1px solid rgba(194, 65, 12, 0.35) !important;
+        }
+        
+        .result-head { text-align: center; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .result-head h3 { font-size: 15px; font-weight: 800; color: #111827; tracking-tight: -0.3px; text-transform: uppercase; }
+        .result-head p { font-size: 10px; color: #9ca3af; font-weight: 700; }
+        
+        /* Rank Badge */
+        .rank-badge { font-size: 8px; font-weight: 800; padding: 3px 10px; border-radius: 99px; white-space: nowrap; display: flex; align-items: center; gap: 4px; width: fit-content; }
+        .badge-gold { background: #059669; color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .badge-silver { background: #2563eb; color: white; }
+        .badge-bronze { background: #b45309; color: white; }
+        .badge-normal { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
+        
+        /* Box Nilai Vertikal */
+        .result-body { display: flex; flex-direction: column; gap: 10px; }
+        .score-box-item {
+            background: rgba(255, 255, 255, 0.65); border: 1px solid white;
+            padding: 12px 16px; border-radius: 18px; display: flex; 
+            justify-content: space-between; align-items: center;
+        }
+        .score-box-left { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+        .score-box-left .name { font-size: 11px; font-weight: 800; color: #6b7280; }
+        .pred-badge { font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 6px; }
+        
+        .p-baik { background: rgba(16, 185, 129, 0.1); color: #047857; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .p-memadai { background: rgba(59, 130, 246, 0.1); color: #1d4ed8; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .p-kurang { background: rgba(245, 158, 11, 0.1); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.2); }
+        
+        .score-box-right { font-size: 22px; font-weight: 800; color: #111827; }
+        
+        .result-foot {
+            background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.12);
+            padding: 12px; border-radius: 14px; text-align: center;
+            font-size: 11px; font-weight: 700; color: #1d4ed8;
+        }
+        .alert-error { background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); color: #dc2626; padding: 14px; border-radius: 16px; text-align: center; font-size: 12px; font-weight: 700; }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+<body>
 
-    <header class="bg-blue-600 text-white shadow-md">
-        <div class="max-w-md mx-auto px-4 py-6 text-center">
-            <p class="text-xs font-bold tracking-widest uppercase opacity-80">Dinas Pendidikan Kab. Bandung</p>
-            <h1 class="text-xl font-extrabold mt-1">SDN CIPELAH 1</h1>
-            <p class="text-sm opacity-90 mt-1">Hasil Tes Kemampuan Akademik (TKA) 2026</p>
-        </div>
-    </header>
-
-    <main class="max-w-md mx-auto w-full px-4 py-6 flex-grow">
-        
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-6">
-            <h2 class="text-base font-bold mb-1 text-slate-700">Cari Berdasarkan Nama</h2>
-            <p class="text-xs text-slate-500 mb-4">Ketik nama panggilan atau nama lengkap kamu di bawah ini.</p>
-            
-            <div class="space-y-3">
-                <input type="text" id="nameInput" placeholder="Contoh: Ilham atau Siti..." 
-                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base font-semibold">
-                
-                <button onclick="prosesCari()" id="btnCari"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 active:scale-[0.99] flex justify-center items-center gap-2">
-                    <span>Periksa Nilai Kamu ✨</span>
-                </button>
+    <div class="container-mobile">
+        <header class="m3-glass">
+            <div class="badge-top">
+                <i class="fa-solid fa-graduation-cap"></i> TKA SD/MI TAHUN 2026
             </div>
-        </div>
+            <h1>SDN CIPELAH 1</h1>
+            <p>Hasil Tes Kemampuan Akademik Kelas 6</p>
+        </header>
 
-        <div id="loadingArea" class="hidden flex flex-col items-center justify-center py-10 space-y-3">
-            <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-            <p class="text-sm font-semibold text-blue-600 animate-pulse">Membuka amplop nilai kamu...</p>
-        </div>
-
-        <div id="resultArea" class="space-y-4">
+        <section class="m3-glass search-box">
+            <h2>Periksa Nilai Kamu</h2>
+            <p>Ketik nama panggilan atau nama lengkapmu di bawah ini.</p>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-user icon-fa"></i>
+                <input type="text" id="nameInput" placeholder="Contoh: Riska atau Ilham..." autocomplete="off">
             </div>
+            <button onclick="prosesCari()" id="btnCari" class="btn-cari">
+                <i class="fa-solid fa-envelope-open-text"></i> Buka Amplop Nilai ✨
+            </button>
+        </section>
 
-    </main>
+        <div id="loadingArea" class="loading-area hidden">
+            <div class="spinner"></div>
+            <div class="loading-text">Mencari lembar jawabanmu...</div>
+        </div>
 
-    <footer class="max-w-md mx-auto w-full px-4 py-4 text-center text-xs text-slate-400 border-t border-slate-100">
-        &copy; 2026 SDN CIPELAH 1. <br>Kepala Sekolah: Partimah, S.Pd.
-    </footer>
+        <div id="resultOutput" class="hidden">
+            </div>
+    </div>
 
     <script>
-        // Data lengkap hasil TKA SDN CIPELAH 1
-        const dataSiswa = [
-            { no: "1", nisn: "0132461788", nama: "ILHAM RIZKY ALFAHRIZI", mtk: "43.33", ketMtk: "Memadai", bing: "56.67", ketBing: "Memadai" },
-            { no: "2", nisn: "3130974096", nama: "SITI WIDIA", mtk: "33.33", ketMtk: "Memadai", bing: "40.00", ketBing: "Kurang" },
-            { no: "3", nisn: "0151908712", nama: "DAVI KAIS JUANDA", mtk: "30.00", ketMtk: "Kurang", bing: "43.33", ketBing: "Kurang" },
-            { no: "4", nisn: "0143885017", nama: "SILVIANI NOVITA SARI", mtk: "53.33", ketMtk: "Memadai", bing: "60.00", ketBing: "Memadai" },
-            { no: "5", nisn: "0135754495", nama: "INTAN AYU KHARISMAWATI", mtk: "60.00", ketMtk: "Baik", bing: "76.67", ketBing: "Baik" },
-            { no: "6", nisn: "0133226475", nama: "SRI NURI RAHAYU", mtk: "50.00", ketMtk: "Memadai", bing: "56.67", ketBing: "Memadai" },
-            { no: "7", nisn: "0138337206", nama: "RESA APRISA SUTIAWAN", mtk: "26.67", ketMtk: "Kurang", bing: "66.67", ketBing: "Memadai" },
-            { no: "8", nisn: "0137862566", nama: "N. RISKA", mtk: "70.00", ketMtk: "Baik", bing: "80.00", ketBing: "Baik" },
-            { no: "9", nisn: "0133165607", nama: "DEBI SAPA MAULANA", mtk: "43.33", ketMtk: "Memadai", bing: "66.67", ketBing: "Memadai" },
-            { no: "10", nisn: "3120819714", nama: "ALFA FADEL ALRAFIF", mtk: "43.33", ketMtk: "Memadai", bing: "36.67", ketBing: "Kurang" },
-            { no: "11", nisn: "3133464749", nama: "KEISYA AINUN NISA AZ-ZAHRA", mtk: "46.67", ketMtk: "Memadai", bing: "80.00", ketBing: "Baik" },
-            { no: "12", nisn: "0137851232", nama: "RAZKA DEAN PRAYOGA", mtk: "23.33", ketMtk: "Kurang", bing: "60.00", ketBing: "Memadai" },
-            { no: "13", nisn: "0128121725", nama: "KAPA ADITIΑ", mtk: "33.33", ketMtk: "Memadai", bing: "30.00", ketBing: "Kurang" },
-            { no: "14", nisn: "3135763448", nama: "DESRI DESTIARA SAPIRA", mtk: "40.00", ketMtk: "Memadai", bing: "60.00", ketBing: "Memadai" },
-            { no: "15", nisn: "3135739079", nama: "WANDI IJAYA PUTRA", mtk: "63.33", ketMtk: "Baik", bing: "70.00", ketBing: "Memadai" },
-            { no: "16", nisn: "0135438266", nama: "MUHAMMAD RIZWAN AGUSTIN", mtk: "53.33", ketMtk: "Memadai", bing: "50.00", ketBing: "Memadai" },
-            { no: "17", nisn: "0148872031", nama: "AMANDA AULIA PUTRI", mtk: "50.00", ketMtk: "Memadai", bing: "70.00", ketBing: "Memadai" },
-            { no: "18", nisn: "0139146427", nama: "MUHAMAD REHAN", mtk: "33.33", ketMtk: "Memadai", bing: "43.33", ketBing: "Kurang" },
-            { no: "19", nisn: "3141557319", nama: "ISMA", mtk: "50.00", ketMtk: "Memadai", bing: "56.67", ketBing: "Memadai" },
-            { no: "20", nisn: "3148931316", nama: "MUHAMMAD FADIL FEBRIANSYAH", mtk: "43.33", ketMtk: "Memadai", bing: "33.33", ketBing: "Kurang" },
-            { no: "21", nisn: "0138470816", nama: "MUHAMAD RAYHAN", mtk: "30.00", ketMtk: "Kurang", bing: "63.33", ketBing: "Memadai" },
-            { no: "22", nisn: "0137045398", nama: "NAFIS MUHAMMAD HASAN", mtk: "56.67", ketMtk: "Baik", bing: "50.00", ketBing: "Memadai" },
-            { no: "23", nisn: "0136386385", nama: "TENDI HERDIAN", mtk: "46.67", ketMtk: "Memadai", bing: "53.33", ketBing: "Memadai" },
-            { no: "24", nisn: "0142605057", nama: "ELISYA CANTIKA ANGGRAENI", mtk: "30.00", ketMtk: "Kurang", bing: "53.33", ketBing: "Memadai" },
-            { no: "25", nisn: "0134912950", nama: "DIO FANI SEPTA PRATAMA", mtk: "33.33", ketMtk: "Memadai", bing: "26.67", ketBing: "Kurang" },
-            { no: "26", nisn: "0134987757", nama: "DASEP MAULANA", mtk: "26.67", ketMtk: "Kurang", bing: "43.33", ketBing: "Kurang" },
-            { no: "27", nisn: "3139622400", nama: "MUHAMAD SANDI PIRMANSYAH", mtk: "43.33", ketMtk: "Memadai", bing: "40.00", ketBing: "Kurang" },
-            { no: "28", nisn: "3132274032", nama: "SHAKILA A ALIFATUNNISA NUR", mtk: "46.67", ketMtk: "Memadai", bing: "70.00", ketBing: "Memadai" },
-            { no: "29", nisn: "0148383922", nama: "ASQIA FRIDA ANJANI", mtk: "36.67", ketMtk: "Memadai", bing: "60.00", ketBing: "Memadai" },
-            { no: "30", nisn: "0136863145", nama: "MUHAMAD NIZAR NUR RAZAB", mtk: "60.00", ketMtk: "Baik", bing: "70.00", ketBing: "Memadai" },
-            { no: "31", nisn: "0147026809", nama: "AMELIA AZAHRA", mtk: "26.67", ketMtk: "Kurang", bing: "46.67", ketBing: "Kurang" },
-            { no: "32", nisn: "0133103346", nama: "FADIYA SYIFWATUL YUMNA", mtk: "53.33", ketMtk: "Memadai", bing: "80.00", ketBing: "Baik" },
-            { no: "33", nisn: "0138485605", nama: "AL NADJIHAN NABIL MUFTI", mtk: "53.33", ketMtk: "Memadai", bing: "56.67", ketBing: "Memadai" },
-            { no: "34", nisn: "3123565730", nama: "ILHAM HAMZAH", mtk: "53.33", ketMtk: "Memadai", bing: "46.67", ketBing: "Kurang" },
-            { no: "35", nisn: "0144200858", nama: "RIFANI NAZWA KHAIRA", mtk: "46.67", ketMtk: "Memadai", bing: "46.67", ketBing: "Kurang" }
+        const rawSiswa = [
+            { nisn: "0132461788", nama: "ILHAM RIZKY ALFAHRIZI", mtk: 43.33, ketMtk: "Memadai", bing: 56.67, ketBing: "Memadai" },
+            { nisn: "3130974096", nama: "SITI WIDIA", mtk: 33.33, ketMtk: "Memadai", bing: 40.00, ketBing: "Kurang" },
+            { nisn: "0151908712", nama: "DAVI KAIS JUANDA", mtk: 30.00, ketMtk: "Kurang", bing: 43.33, ketBing: "Kurang" },
+            { nisn: "0143885017", nama: "SILVIANI NOVITA SARI", mtk: 53.33, ketMtk: "Memadai", bing: 60.00, ketBing: "Memadai" },
+            { nisn: "0135754495", nama: "INTAN AYU KHARISMAWATI", mtk: 60.00, ketMtk: "Baik", bing: 76.67, ketBing: "Baik" },
+            { nisn: "0133226475", nama: "SRI NURI RAHAYU", mtk: 50.00, ketMtk: "Memadai", bing: 56.67, ketBing: "Memadai" },
+            { nisn: "0138337206", nama: "RESA APRISA SUTIAWAN", mtk: 26.67, ketMtk: "Kurang", bing: 66.67, ketBing: "Memadai" },
+            { nisn: "0137862566", nama: "N. RISKA", mtk: 70.00, ketMtk: "Baik", bing: 80.00, ketBing: "Baik" },
+            { nisn: "0133165607", nama: "DEBI SAPA MAULANA", mtk: 43.33, ketMtk: "Memadai", bing: 66.67, ketBing: "Memadai" },
+            { nisn: "3120819714", nama: "ALFA FADEL ALRAFIF", mtk: 43.33, ketMtk: "Memadai", bing: 36.67, ketBing: "Kurang" },
+            { nisn: "3133464749", nama: "KEISYA AINUN NISA AZ-ZAHRA", mtk: 46.67, ketMtk: "Memadai", bing: 80.00, ketBing: "Baik" },
+            { nisn: "0137851232", nama: "RAZKA DEAN PRAYOGA", mtk: 23.33, ketMtk: "Kurang", bing: 60.00, ketBing: "Memadai" },
+            { nisn: "0128121725", nama: "KAPA ADITIΑ", mtk: 33.33, ketMtk: "Memadai", bing: 30.00, ketBing: "Kurang" },
+            { nisn: "3135763448", nama: "DESRI DESTIARA SAPIRA", mtk: 40.00, ketMtk: "Memadai", bing: 60.00, ketBing: "Memadai" },
+            { nisn: "3135739079", nama: "WANDI IJAYA PUTRA", mtk: 63.33, ketMtk: "Baik", bing: 70.00, ketBing: "Memadai" },
+            { nisn: "0135438266", nama: "MUHAMMAD RIZWAN AGUSTIN", mtk: 53.33, ketMtk: "Memadai", bing: 50.00, ketBing: "Memadai" },
+            { nisn: "0148872031", nama: "AMANDA AULIA PUTRI", mtk: 50.00, ketMtk: "Memadai", bing: 70.00, ketBing: "Memadai" },
+            { nisn: "0139146427", nama: "MUHAMAD REHAN", mtk: 33.33, ketMtk: "Memadai", bing: 43.33, ketBing: "Kurang" },
+            { nisn: "3141557319", nama: "ISMA", mtk: 50.00, ketMtk: "Memadai", bing: 56.67, ketBing: "Memadai" },
+            { nisn: "3148931316", nama: "MUHAMMAD FADIL FEBRIANSYAH", mtk: 43.33, ketMtk: "Memadai", bing: 33.33, ketBing: "Kurang" },
+            { nisn: "0138470816", nama: "MUHAMAD RAYHAN", mtk: 30.00, ketMtk: "Kurang", bing: 63.33, ketBing: "Memadai" },
+            { nisn: "0137045398", nama: "NAFIS MUHAMMAD HASAN", mtk: 56.67, ketMtk: "Baik", bing: 50.00, ketBing: "Memadai" },
+            { nisn: "0136386385", nama: "TENDI HERDIAN", mtk: 46.67, ketMtk: "Memadai", bing: 53.33, ketBing: "Memadai" },
+            { nisn: "0142605057", nama: "ELISYA CANTIKA ANGGRAENI", mtk: 30.00, ketMtk: "Kurang", bing: 53.33, ketBing: "Memadai" },
+            { nisn: "0134912950", nama: "DIO FANI SEPTA PRATAMA", mtk: 33.33, ketMtk: "Memadai", bing: 26.67, ketBing: "Kurang" },
+            { nisn: "0134987757", nama: "DASEP MAULANA", mtk: 26.67, ketMtk: "Kurang", bing: 43.33, ketBing: "Kurang" },
+            { nisn: "3139622400", nama: "MUHAMAD SANDI PIRMANSYAH", mtk: 43.33, ketMtk: "Memadai", bing: 40.00, ketBing: "Kurang" },
+            { nisn: "3132274032", nama: "SHAKILA A ALIFATUNNISA NUR", mtk: 46.67, ketMtk: "Memadai", bing: 70.00, ketBing: "Memadai" },
+            { nisn: "0148383922", nama: "ASQIA FRIDA ANJANI", mtk: 36.67, ketMtk: "Memadai", bing: 60.00, ketBing: "Memadai" },
+            { nisn: "0136863145", nama: "MUHAMAD NIZAR NUR RAZAB", mtk: 60.00, ketMtk: "Baik", bing: 70.00, ketBing: "Memadai" },
+            { nisn: "0147026809", nama: "AMELIA AZAHRA", mtk: 26.67, ketMtk: "Kurang", bing: 46.67, ketBing: "Kurang" },
+            { nisn: "0133103346", nama: "FADIYA SYIFWATUL YUMNA", mtk: 53.33, ketMtk: "Memadai", bing: 80.00, ketBing: "Baik" },
+            { nisn: "0138485605", nama: "AL NADJIHAN NABIL MUFTI", mtk: 53.33, ketMtk: "Memadai", bing: 56.67, ketBing: "Memadai" },
+            { nisn: "3123565730", nama: "ILHAM HAMZAH", mtk: 53.33, ketMtk: "Memadai", bing: 46.67, ketBing: "Kurang" },
+            { nisn: "0144200858", nama: "RIFANI NAZWA KHAIRA", mtk: 46.67, ketMtk: "Memadai", bing: 46.67, ketBing: "Kurang" }
         ];
+
+        // Hitung rata-rata dan ranking internal sekelas secara presisi
+        const dataSiswaTeranking = rawSiswa
+            .map(s => ({
+                ...s,
+                rataRata: parseFloat(((s.mtk + s.bing) / 2).toFixed(2))
+            }))
+            .sort((a, b) => b.rataRata - a.rataRata)
+            .map((siswa, indeks) => ({
+                ...siswa,
+                rank: indeks + 1
+            }));
 
         function prosesCari() {
             const input = document.getElementById('nameInput').value.toUpperCase().trim();
-            const resultArea = document.getElementById('resultArea');
             const loadingArea = document.getElementById('loadingArea');
+            const resultOutput = document.getElementById('resultOutput');
             const btnCari = document.getElementById('btnCari');
 
-            // Validasi jika input kurang dari 2 karakter
             if (input === "" || input.length < 2) {
-                resultArea.innerHTML = `
-                    <div class="bg-amber-50 border border-amber-200 text-amber-700 p-4 rounded-xl text-center text-sm font-semibold">
-                        Ketik minimal 2 huruf untuk mulai mencari!
-                    </div>
-                `;
+                resultOutput.innerHTML = `<div class="alert-error efek-surprise">Ketik minimal 2 huruf nama untuk mulai mencari!</div>`;
+                resultOutput.classList.remove('hidden');
                 return;
             }
 
-            // Sembunyikan hasil lama, kunci tombol, dan tampilkan loading
-            resultArea.innerHTML = "";
+            resultOutput.innerHTML = "";
+            resultOutput.classList.add('hidden');
             loadingArea.classList.remove('hidden');
             btnCari.disabled = true;
-            btnCari.classList.add('opacity-50');
+            btnCari.style.opacity = "0.5";
 
-            // Jeda dramatis (1.5 Detik) sebelum menampilkan hasil surprise
             setTimeout(() => {
                 loadingArea.classList.add('hidden');
                 btnCari.disabled = false;
-                btnCari.classList.remove('opacity-50');
-                
-                // Cari data siswa berdasarkan kecocokan nama
-                const hasilFilter = dataSiswa.filter(s => s.nama.includes(input));
+                btnCari.style.opacity = "1";
+
+                const hasilFilter = dataSiswaTeranking.filter(s => s.nama.includes(input));
 
                 if (hasilFilter.length > 0) {
                     let htmlContent = "";
                     
                     hasilFilter.forEach(siswa => {
-                        const badgeMtk = getBadgeClass(siswa.ketMtk);
-                        const badgeBi = getBadgeClass(siswa.ketBing);
+                        const badgeMtk = getM3BadgeStyle(siswa.ketMtk);
+                        const badgeBi = getM3BadgeStyle(siswa.ketBing);
+                        const medal = getRankBadge(siswa.rank);
+
+                        let cardColorClass = "m3-glass";
+                        if (siswa.rank === 1) cardColorClass = "m3-glass glass-gold";
+                        else if (siswa.rank === 2) cardColorClass = "m3-glass glass-silver";
+                        else if (siswa.rank === 3) cardColorClass = "m3-glass glass-bronze";
 
                         htmlContent += `
-                            <div class="bg-white rounded-2xl shadow-xl border-2 border-blue-500 p-6 space-y-4 efek-surprise relative overflow-hidden">
-                                <div class="absolute -top-6 -right-6 w-16 h-16 bg-yellow-400 rounded-full opacity-20 blur-sm"></div>
-                                <div class="absolute -bottom-6 -left-6 w-14 h-14 bg-blue-400 rounded-full opacity-20 blur-sm"></div>
-                                
-                                <div class="border-b border-slate-100 pb-3 text-center">
-                                    <span class="text-[10px] font-extrabold bg-amber-100 text-amber-800 px-3 py-1 rounded-full uppercase tracking-wider">✨ Data Ditemukan ✨</span>
-                                    <h3 class="text-xl font-black text-slate-800 mt-3 tracking-tight">${siswa.nama}</h3>
-                                    <p class="text-xs text-slate-400 font-semibold mt-0.5">NISN: ${siswa.nisn}</p>
+                            <div class="${cardColorClass} card-result efek-surprise" style="margin-bottom: 12px;">
+                                <div class="result-head">
+                                    <div>${medal}</div>
+                                    <h3>${siswa.nama}</h3>
+                                    <p>NISN: ${siswa.nisn}</p>
                                 </div>
                                 
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div class="bg-gradient-to-b from-slate-50 to-slate-100/50 p-4 rounded-2xl border border-slate-100 text-center shadow-inner">
-                                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Matematika</p>
-                                        <p class="text-3xl font-black text-slate-800 my-1">${siswa.mtk}</p>
-                                        <span class="inline-block text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${badgeMtk}">${siswa.ketMtk}</span>
+                                <div class="result-body">
+                                    <div class="score-box-item">
+                                        <div class="score-box-left">
+                                            <div class="name">MATEMATIKA</div>
+                                            <div class="pred-badge ${badgeMtk}">${siswa.ketMtk}</div>
+                                        </div>
+                                        <div class="score-box-right">${siswa.mtk.toFixed(2)}</div>
                                     </div>
-                                    <div class="bg-gradient-to-b from-slate-50 to-slate-100/50 p-4 rounded-2xl border border-slate-100 text-center shadow-inner">
-                                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">B. Indonesia</p>
-                                        <p class="text-3xl font-black text-slate-800 my-1">${siswa.bing}</p>
-                                        <span class="inline-block text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${badgeBi}">${siswa.ketBing}</span>
+                                    
+                                    <div class="score-box-item">
+                                        <div class="score-box-left">
+                                            <div class="name">BAHASA INDONESIA</div>
+                                            <div class="pred-badge ${badgeBi}">${siswa.ketBing}</div>
+                                        </div>
+                                        <div class="score-box-right">${siswa.bing.toFixed(2)}</div>
                                     </div>
                                 </div>
-                                
-                                <p class="text-xs text-center text-blue-600 font-bold italic pt-2 animate-bounce">
-                                    🎉 Selamat yaa! Tingkatkan terus prestasimu! 🎉
-                                </p>
+
+                                <div class="result-foot">
+                                    Rata-Rata Ujian Kombinasi: ${siswa.rataRata}
+                                </div>
                             </div>
                         `;
                     });
                     
-                    resultArea.innerHTML = htmlContent;
+                    resultOutput.innerHTML = htmlContent;
                 } else {
-                    resultArea.innerHTML = `
-                        <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-center text-sm font-semibold efek-surprise">
-                            Nama tidak ditemukan. Coba ketik nama panggilan lainnya ya!
-                        </div>
-                    `;
+                    resultOutput.innerHTML = `<div class="alert-error efek-surprise">Nama tidak ditemukan. Periksa kembali ejaan nama panggilan kamu!</div>`;
                 }
-            }, 1500);
+                resultOutput.classList.remove('hidden');
+            }, 1200);
         }
 
-        function getBadgeClass(keterangan) {
-            if (keterangan === "Baik") return "bg-green-100 text-green-700";
-            if (keterangan === "Memadai") return "bg-blue-100 text-blue-700";
-            return "bg-amber-100 text-amber-700";
+        function getRankBadge(rank) {
+            if (rank === 1) return `<div class="rank-badge badge-gold"><i class="fa-solid fa-trophy"></i> Rank 1</div>`;
+            if (rank === 2) return `<div class="rank-badge badge-silver"><i class="fa-solid fa-medal"></i> Rank 2</div>`;
+            if (rank === 3) return `<div class="rank-badge badge-bronze"><i class="fa-solid fa-medal"></i> Rank 3</div>`;
+            return `<div class="rank-badge badge-normal">Rank #${rank}</div>`;
+        }
+
+        function getM3BadgeStyle(keterangan) {
+            if (keterangan === "Baik") return "p-baik";
+            if (keterangan === "Memadai") return "p-memadai";
+            return "p-kurang";
         }
     </script>
 </body>
