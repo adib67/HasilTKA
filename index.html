@@ -20,7 +20,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: #f0f7ff;
             color: #1a202c;
-            padding: 16px 16px 80px 16px; /* Memberikan ruang bawah agar tidak tertutup navbar */
+            padding: 16px 16px 80px 16px; /* Ruang bawah agar tidak tertutup navbar */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -60,13 +60,13 @@
         header h1 { font-size: 20px; font-weight: 800; color: #111827; }
         header p { font-size: 12px; color: #6b7280; font-weight: 600; margin-top: 2px; }
         
-        /* === NAVBAR UTAMA DI BAGIAN BAWAH (MOBILE STYLE) === */
+        /* === NAVBAR UTAMA DI BAGIAN BAWAH === */
         .m3-navbar {
             position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
             width: calc(100% - 32px); max-width: 408px; height: 64px;
             background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.8);
-            border-radius: 20px; shadow: 0 8px 24px rgba(0,0,0,0.06);
+            border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.06);
             display: grid; grid-template-columns: 1fr 1fr; z-index: 999;
             padding: 4px;
         }
@@ -200,10 +200,10 @@
 
         <section id="panelPencarian" class="m3-glass search-box">
             <h2>Periksa Nilai Kamu</h2>
-            <p>Ketik nama panggilan atau nama lengkapmu di bawah ini.</p>
+            <p>Masukkan 10 digit NISN kamu secara lengkap untuk membuka lembar hasil ujian.</p>
             <div class="input-wrapper">
-                <i class="fa-solid fa-user icon-fa"></i>
-                <input type="text" id="nameInput" placeholder="Contoh: Riska atau Ilham..." autocomplete="off">
+                <i class="fa-solid fa-id-card icon-fa"></i>
+                <input type="number" id="nisnInput" placeholder="Contoh: 0137862566..." oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);" autocomplete="off">
             </div>
             <button onclick="prosesCari()" id="btnCari" class="btn-cari">
                 <i class="fa-solid fa-envelope-open-text"></i> Buka Amplop Nilai ✨
@@ -212,7 +212,7 @@
 
         <div id="loadingArea" class="loading-area hidden">
             <div class="spinner"></div>
-            <div class="loading-text">Mencari lembar jawabanmu...</div>
+            <div class="loading-text">Memverifikasi NISN kamu...</div>
         </div>
 
         <div id="contentOutput">
@@ -269,7 +269,7 @@
             { nisn: "0144200858", nama: "RIFANI NAZWA KHAIRA", mtk: 46.67, ketMtk: "Memadai", bing: 46.67, ketBing: "Kurang" }
         ];
 
-        // Kalkulasi data ranking kelas secara dinamis
+        // Hitung rata-rata dan rangking kelas otomatis
         const dataSiswaTeranking = rawSiswa
             .map(s => ({
                 ...s,
@@ -281,7 +281,7 @@
                 rank: indeks + 1
             }));
 
-        // Kalkulasi data statistik untuk Laman Beranda (Home)
+        // Hitung statistik kelas kolektif
         const totalSiswa = dataSiswaTeranking.length;
         const avgMtk = (dataSiswaTeranking.reduce((acc, curr) => acc + curr.mtk, 0) / totalSiswa).toFixed(2);
         const avgIndo = (dataSiswaTeranking.reduce((acc, curr) => acc + curr.bing, 0) / totalSiswa).toFixed(2);
@@ -294,23 +294,20 @@
             countIndo[s.ketBing]++;
         });
 
-        // REVISI: Sistem Pengendali Navigasi Laman (Default: Nilaiku)
         function pindahMenu(menu) {
             const navHome = document.getElementById('navHome');
             const navNilaiku = document.getElementById('navNilaiku');
             const panelPencarian = document.getElementById('panelPencarian');
             const container = document.getElementById('contentOutput');
 
-            // Reset status aktif menu
             navHome.classList.remove('active');
             navNilaiku.classList.remove('active');
             container.innerHTML = "";
 
             if (menu === 'home') {
                 navHome.classList.add('active');
-                panelPencarian.classList.add('hidden'); // Sembunyikan pencarian di Beranda
+                panelPencarian.classList.add('hidden');
                 
-                // Hitung persen visual bar grafis rekapitulasi kelas
                 const pctMtk = {
                     Baik: (countMtk.Baik / totalSiswa * 100).toFixed(0),
                     Memadai: (countMtk.Memadai / totalSiswa * 100).toFixed(0),
@@ -384,19 +381,20 @@
                 `;
             } else if (menu === 'nilaiku') {
                 navNilaiku.classList.add('active');
-                panelPencarian.classList.remove('hidden'); // Tampilkan kolom input cari
-                document.getElementById('nameInput').value = "";
+                panelPencarian.classList.remove('hidden');
+                document.getElementById('nisnInput').value = "";
             }
         }
 
         function prosesCari() {
-            const input = document.getElementById('nameInput').value.toUpperCase().trim();
+            // REVISI: Pencarian dicocokkan berdasarkan value input NISN siswa
+            const inputNisn = document.getElementById('nisnInput').value.trim();
             const loadingArea = document.getElementById('loadingArea');
             const container = document.getElementById('contentOutput');
             const btnCari = document.getElementById('btnCari');
 
-            if (input === "" || input.length < 2) {
-                container.innerHTML = `<div class="alert-error efek-surprise">Ketik minimal 2 huruf nama untuk mulai mencari!</div>`;
+            if (inputNisn === "" || inputNisn.length < 5) {
+                container.innerHTML = `<div class="alert-error efek-surprise">Masukkan NISN valid secara lengkap untuk memeriksa nilai! </div>`;
                 return;
             }
 
@@ -410,57 +408,52 @@
                 btnCari.disabled = false;
                 btnCari.style.opacity = "1";
 
-                const hasilFilter = dataSiswaTeranking.filter(s => s.nama.includes(input));
+                // REVISI: Logika pencarian mencocokkan data NISN
+                const siswa = dataSiswaTeranking.find(s => s.nisn === inputNisn);
 
-                if (hasilFilter.length > 0) {
-                    let htmlContent = "";
-                    
-                    hasilFilter.forEach(siswa => {
-                        const badgeMtk = getM3BadgeStyle(siswa.ketMtk);
-                        const badgeBi = getM3BadgeStyle(siswa.ketBing);
-                        const medal = getRankBadge(siswa.rank);
+                if (siswa) {
+                    const badgeMtk = getM3BadgeStyle(siswa.ketMtk);
+                    const badgeBi = getM3BadgeStyle(siswa.ketBing);
+                    const medal = getRankBadge(siswa.rank);
 
-                        let cardColorClass = "m3-glass";
-                        if (siswa.rank === 1) cardColorClass = "m3-glass glass-gold";
-                        else if (siswa.rank === 2) cardColorClass = "m3-glass glass-silver";
-                        else if (siswa.rank === 3) cardColorClass = "m3-glass glass-bronze";
+                    let cardColorClass = "m3-glass";
+                    if (siswa.rank === 1) cardColorClass = "m3-glass glass-gold";
+                    else if (siswa.rank === 2) cardColorClass = "m3-glass glass-silver";
+                    else if (siswa.rank === 3) cardColorClass = "m3-glass glass-bronze";
 
-                        htmlContent += `
-                            <div class="${cardColorClass} card-result efek-surprise" style="margin-bottom: 12px;">
-                                <div class="result-head">
-                                    <div>${medal}</div>
-                                    <h3>${siswa.nama}</h3>
-                                    <p>NISN: ${siswa.nisn}</p>
+                    container.innerHTML = `
+                        <div class="${cardColorClass} card-result efek-surprise">
+                            <div class="result-head">
+                                <div>${medal}</div>
+                                <h3>${siswa.nama}</h3>
+                                <p>NISN: ${siswa.nisn}</p>
+                            </div>
+                            
+                            <div class="result-body">
+                                <div class="score-box-item">
+                                    <div class="score-box-left">
+                                        <div class="name">MATEMATIKA</div>
+                                        <div class="pred-badge ${badgeMtk}">${siswa.ketMtk}</div>
+                                    </div>
+                                    <div class="score-box-right">${siswa.mtk.toFixed(2)}</div>
                                 </div>
                                 
-                                <div class="result-body">
-                                    <div class="score-box-item">
-                                        <div class="score-box-left">
-                                            <div class="name">MATEMATIKA</div>
-                                            <div class="pred-badge ${badgeMtk}">${siswa.ketMtk}</div>
+                                <div class="score-box-item">
+                                    <div class="score-box-left">
+                                        <div class="name">BAHASA INDONESIA</div>
+                                        <div class="pred-badge ${badgeBi}">${siswa.ketBing}</div>
                                         </div>
-                                        <div class="score-box-right">${siswa.mtk.toFixed(2)}</div>
-                                    </div>
-                                    
-                                    <div class="score-box-item">
-                                        <div class="score-box-left">
-                                            <div class="name">BAHASA INDONESIA</div>
-                                            <div class="pred-badge ${badgeBi}">${siswa.ketBing}</div>
-                                        </div>
-                                        <div class="score-box-right">${siswa.bing.toFixed(2)}</div>
-                                    </div>
-                                </div>
-
-                                <div class="result-foot">
-                                    Rata-Rata Ujian Kombinasi: ${siswa.rataRata}
+                                    <div class="score-box-right">${siswa.bing.toFixed(2)}</div>
                                 </div>
                             </div>
-                        `;
-                    });
-                    
-                    container.innerHTML = htmlContent;
+
+                            <div class="result-foot">
+                                Rata-Rata Ujian Kombinasi: ${siswa.rataRata}
+                            </div>
+                        </div>
+                    `;
                 } else {
-                    container.innerHTML = `<div class="alert-error efek-surprise">Nama tidak ditemukan. Periksa kembali ejaan nama panggilan kamu!</div>`;
+                    container.innerHTML = `<div class="alert-error efek-surprise">NISN tidak ditemukan. Pastikan 10 digit nomor yang Anda masukkan sudah benar! </div>`;
                 }
             }, 1200);
         }
@@ -478,7 +471,6 @@
             return "p-kurang";
         }
 
-        // Kunci laman mula-mula di posisi default menu "Nilaiku"
         window.onload = function() {
             pindahMenu('nilaiku');
         };
